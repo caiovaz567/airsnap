@@ -1,6 +1,6 @@
 {
-  "name": "Meu Ar",
-  "short_name": "Meu Ar",
+  "name": "AirSnap",
+  "short_name": "AirSnap",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",

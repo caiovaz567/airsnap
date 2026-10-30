@@ -1,8 +1,8 @@
-# Meu Ar
+# AirSnap
 
 App web leve para controlar um ar-condicionado LG e acompanhar o gasto de energia em reais, direto do celular.
 
-Nasceu porque o app oficial LG ThinQ vive travado em loading infinito. O Meu Ar abre na hora com o último estado salvo e atualiza em segundo plano.
+Nasceu porque o app oficial LG ThinQ vive travado em loading infinito. O AirSnap abre na hora com o último estado salvo e atualiza em segundo plano.
 
 ## O que faz
 

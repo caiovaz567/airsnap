@@ -6,11 +6,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Meu Ar">
+<meta name="apple-mobile-web-app-title" content="AirSnap">
 <meta name="theme-color" content="#000000">
 <link rel="apple-touch-icon" href="/icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<title>Meu Ar</title>
+<title>AirSnap</title>
 <style>
   :root {
     --bg: #000; --card: #2a2d33; --card2: #3a3e46; --text: #f2f4f8; --muted: #a3a9b5; --faint: #6b717d;
@@ -118,7 +118,7 @@
 <div class="wrap">
   <header>
     <div>
-      <h1 id="title">Meu Ar</h1>
+      <h1 id="title">AirSnap</h1>
       <div class="sub" id="updated">&nbsp;</div>
     </div>
     <button class="iconbtn" id="refresh" aria-label="Atualizar"><span>&#x21bb;</span></button>
@@ -230,9 +230,9 @@
 
   var $ = function (id) { return document.getElementById(id); };
   var store = {
-    get: function (k) { try { return JSON.parse(localStorage.getItem("meuar." + k)); } catch (e) { return null; } },
-    set: function (k, v) { try { localStorage.setItem("meuar." + k, JSON.stringify(v)); } catch (e) {} },
-    del: function (k) { try { localStorage.removeItem("meuar." + k); } catch (e) {} }
+    get: function (k) { try { return JSON.parse(localStorage.getItem("airsnap." + k)); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem("airsnap." + k, JSON.stringify(v)); } catch (e) {} },
+    del: function (k) { try { localStorage.removeItem("airsnap." + k); } catch (e) {} }
   };
 
   var password = store.get("pw");
@@ -408,7 +408,7 @@
       box.appendChild(b);
     });
     var cur = devices.filter(function (d) { return d.id === currentId; })[0];
-    $("title").textContent = cur ? cur.name : "Meu Ar";
+    $("title").textContent = cur ? cur.name : "AirSnap";
   }
 
   function stamp(ts) {
