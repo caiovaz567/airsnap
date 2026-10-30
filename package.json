@@ -1,0 +1,10 @@
+{
+  "name": "meu-ar",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Controle rápido do ar-condicionado LG e do gasto de energia, via ThinQ Connect",
+  "engines": {
+    "node": ">=20"
+  }
+}

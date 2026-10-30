@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Meu Ar">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" href="/icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<title>Meu Ar</title>
+<style>
+  :root {
+    --bg: #000; --card: #2a2d33; --card2: #3a3e46; --text: #f2f4f8; --muted: #a3a9b5; --faint: #6b717d;
+    --accent: #6f7cf6; --accent-ink: #fff; --bar: #19a7c4; --bar-sel: #6f7cf6; --grid: #3d424b;
+    --on: #6f7cf6; --danger: #ff8a80;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; }
+  body { padding: calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 96px); }
+  .wrap { max-width: 480px; margin: 0 auto; }
+  button { font: inherit; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+  h1 { font-size: 22px; margin: 0; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .iconbtn { background: transparent; border: 0; color: var(--muted); width: 44px; height: 44px;
+    border-radius: 14px; font-size: 22px; flex: none; }
+  .iconbtn.spin span { display: inline-block; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .chips { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 10px; }
+  .chip { background: var(--card); border: 0; color: var(--text); padding: 9px 14px; border-radius: 999px; white-space: nowrap; }
+  .chip.sel { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .card { background: var(--card); border-radius: 16px; padding: 16px; margin-bottom: 10px; }
+  .hidden { display: none !important; }
+  .disabled { opacity: .4; pointer-events: none; }
+
+  .hero { text-align: center; padding: 18px 0 10px; }
+  .hero .room { font-size: 18px; }
+  .hero .state { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .moderow { display: flex; align-items: center; justify-content: space-between; margin: 6px 0 12px; }
+  .modesel { position: relative; display: inline-flex; align-items: center; gap: 6px; font-size: 24px; }
+  .modesel .caret { font-size: 16px; color: var(--muted); }
+  .modesel select { position: absolute; inset: 0; opacity: 0; width: 100%; font-size: 16px; }
+  .power { width: 64px; height: 64px; border-radius: 50%; border: 0; background: var(--card2); color: var(--muted);
+    font-size: 30px; line-height: 1; }
+  .power.on { background: #e8eaf0; color: var(--on); }
+  .temptitle { text-align: center; color: var(--muted); font-size: 15px; }
+  .temprow { display: flex; align-items: center; justify-content: center; gap: 28px; margin: 4px 0 10px; }
+  .round { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--card2); color: var(--text); font-size: 22px; }
+  .bigtemp { font-size: 34px; font-variant-numeric: tabular-nums; min-width: 110px; text-align: center; }
+  input[type=range] { width: 100%; accent-color: var(--accent); height: 28px; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .tile { background: var(--card); border-radius: 16px; padding: 14px 10px; text-align: center; }
+  .tile .ico { font-size: 30px; line-height: 1.2; }
+  .tile .name { color: var(--muted); font-size: 14px; margin: 4px 0 8px; }
+  .stepper { display: flex; align-items: center; justify-content: space-between; }
+  .stepper .round { width: 34px; height: 34px; font-size: 18px; }
+  .stepper .val { color: #a9b1ff; font-weight: 600; }
+  .switch { position: relative; width: 52px; height: 32px; border-radius: 999px; border: 0; background: var(--card2); }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%;
+    background: #fff; transition: left .15s; }
+  .switch.on { background: var(--accent); }
+  .switch.on::after { left: 23px; }
+
+  .price { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .price input { width: 96px; font-size: 17px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--card2);
+    background: var(--bg); color: var(--text); text-align: right; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .stat { background: var(--card); border-radius: 16px; padding: 14px; }
+  .stat.wide { grid-column: 1 / -1; }
+  .stat .k { color: var(--muted); font-size: 13px; }
+  .stat .v { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .stat .s { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+  .seg { display: flex; border: 1px solid var(--faint); border-radius: 999px; padding: 3px; margin-bottom: 10px; }
+  .seg button { flex: 1; border: 0; background: transparent; color: var(--text); padding: 8px 0; border-radius: 999px; }
+  .seg button.sel { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .nav button { background: transparent; border: 0; color: var(--text); font-size: 24px; width: 44px; height: 40px; }
+  .nav button:disabled { color: var(--faint); }
+  .kv { display: flex; justify-content: space-between; font-size: 15px; padding: 3px 0; font-variant-numeric: tabular-nums; }
+  .kv span:first-child { color: var(--muted); }
+  .chart { position: relative; height: 190px; margin: 12px 0 0 30px; }
+  .gridline { position: absolute; left: 0; right: 0; border-top: 1px solid var(--grid); }
+  .gridline span { position: absolute; left: -30px; top: -8px; width: 26px; text-align: right; font-size: 11px; color: var(--faint); }
+  .bars { position: absolute; inset: 0; display: flex; align-items: flex-end; gap: 2px; }
+  .barhit { flex: 1; height: 100%; display: flex; align-items: flex-end; justify-content: center; cursor: pointer; }
+  .bar { width: 100%; max-width: 28px; background: var(--bar); border-radius: 4px 4px 0 0; min-height: 0; }
+  .barhit.sel .bar { background: var(--bar-sel); }
+  .xlabels { display: flex; gap: 2px; margin-left: 30px; margin-top: 4px; }
+  .xlabels span { flex: 1; text-align: center; font-size: 11px; color: var(--faint); white-space: nowrap; }
+  .detail { background: var(--card); border: 1px solid var(--card2); border-radius: 14px; padding: 12px 14px; margin-top: 10px;
+    display: flex; justify-content: space-between; gap: 8px; font-variant-numeric: tabular-nums; }
+  .detail b { font-weight: 600; }
+  details { margin-top: 10px; color: var(--muted); font-size: 14px; }
+  details table { width: 100%; border-collapse: collapse; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  details td { padding: 5px 0; border-bottom: 1px solid var(--card2); color: var(--text); }
+  details td:not(:first-child) { text-align: right; }
+  .note { color: var(--faint); font-size: 12px; margin-top: 8px; }
+
+  .msg { border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; font-size: 15px; display: none; }
+  .msg.show { display: block; background: rgba(255,138,128,.14); color: var(--danger); }
+  .login input { width: 100%; font-size: 18px; padding: 14px; border-radius: 14px; border: 1px solid var(--card2);
+    background: var(--bg); color: var(--text); margin: 10px 0; }
+  .login button { width: 100%; height: 54px; border: 0; border-radius: 14px; background: var(--accent);
+    color: var(--accent-ink); font-size: 18px; font-weight: 700; }
+  .tabs { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 14px);
+    display: flex; background: var(--card); border: 1px solid var(--card2); border-radius: 999px; padding: 4px; width: min(320px, calc(100% - 32px)); }
+  .tabs button { flex: 1; border: 0; background: transparent; color: var(--muted); padding: 12px 0; border-radius: 999px; font-weight: 600; }
+  .tabs button.sel { background: var(--accent); color: var(--accent-ink); }
+  .foot { text-align: center; margin-top: 14px; }
+  .foot button { background: none; border: 0; color: var(--faint); text-decoration: underline; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 id="title">Meu Ar</h1>
+      <div class="sub" id="updated">&nbsp;</div>
+    </div>
+    <button class="iconbtn" id="refresh" aria-label="Atualizar"><span>&#x21bb;</span></button>
+  </header>
+
+  <div class="msg" id="msg"></div>
+
+  <div class="card login hidden" id="login">
+    <div><b>Digite a senha do app</b></div>
+    <div class="sub">É a senha APP_PASSWORD que você criou. Só precisa fazer isso uma vez.</div>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="Senha">
+    <button id="pwgo">Entrar</button>
+  </div>
+
+  <div id="main" class="hidden">
+    <div class="chips" id="devices"></div>
+
+    <section id="tab-control">
+      <div class="hero">
+        <div class="room">🌡 <span id="room">--</span></div>
+        <div class="state" id="status">--</div>
+      </div>
+
+      <div class="moderow">
+        <label class="modesel" id="modewrap"><span id="modename">--</span><span class="caret">▼</span><select id="mode" aria-label="Modo"></select></label>
+        <button class="power" id="power" aria-label="Ligar ou desligar">⏻</button>
+      </div>
+
+      <div class="card" id="tempcard">
+        <div class="temptitle">Temperatura desejada</div>
+        <div class="temprow">
+          <button class="round" id="tminus" aria-label="Diminuir">&minus;</button>
+          <div class="bigtemp" id="target">--°C</div>
+          <button class="round" id="tplus" aria-label="Aumentar">+</button>
+        </div>
+        <input type="range" id="tslider" min="16" max="30" step="1" aria-label="Temperatura desejada">
+      </div>
+
+      <div class="tiles">
+        <div class="tile" id="windtile">
+          <div class="ico">🌀</div>
+          <div class="name">Velocidade da ventilação</div>
+          <div class="stepper">
+            <button class="round" id="wminus" aria-label="Menos vento">‹</button>
+            <span class="val" id="windval">--</span>
+            <button class="round" id="wplus" aria-label="Mais vento">›</button>
+          </div>
+        </div>
+        <div class="tile" id="swingtile">
+          <div class="ico">↕</div>
+          <div class="name">Circular (cima/baixo)</div>
+          <button class="switch" id="swing" aria-label="Circular de cima para baixo"></button>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-energy" class="hidden">
+      <div class="stats">
+        <div class="stat"><div class="k">Hoje</div><div class="v" id="e-today-r">--</div><div class="s" id="e-today-k">--</div></div>
+        <div class="stat"><div class="k">Este mês</div><div class="v" id="e-month-r">--</div><div class="s" id="e-month-k">--</div></div>
+        <div class="stat wide"><div class="k">Previsão da conta do ar neste mês</div><div class="v" id="e-proj-r">--</div><div class="s" id="e-proj-k">--</div></div>
+      </div>
+
+      <div class="card">
+        <div class="seg" id="eperiod">
+          <button data-p="week">Semana</button><button data-p="month" class="sel">Mês</button><button data-p="year">Ano</button>
+        </div>
+        <div class="nav">
+          <button id="eprev" aria-label="Anterior">‹</button>
+          <b id="elabel">--</b>
+          <button id="enext" aria-label="Próximo">›</button>
+        </div>
+        <div class="kv"><span>Consumo</span><span id="etotal">--</span></div>
+        <div class="kv"><span>Custo</span><span id="ecost">--</span></div>
+        <div class="kv"><span id="eavgk">Média por dia</span><span id="eavg">--</span></div>
+
+        <div class="chart" id="chart"></div>
+        <div class="xlabels" id="xlabels"></div>
+        <div class="detail" id="edetail"><span>--</span><b>--</b></div>
+
+        <details><summary>Ver em tabela</summary><table id="etable"></table></details>
+      </div>
+
+      <div class="card price">
+        <div><b>Preço do kWh</b><div class="sub">Olhe na sua conta de luz</div></div>
+        <div>R$ <input id="kwhprice" inputmode="decimal" aria-label="Preço do kWh em reais"></div>
+      </div>
+      <div class="note">O valor é só do ar-condicionado. Pode ter uma pequena diferença do medidor da sua casa.</div>
+    </section>
+
+    <div class="foot"><button id="logout">Sair (trocar senha)</button></div>
+  </div>
+</div>
+
+<nav class="tabs hidden" id="tabs">
+  <button data-t="control" class="sel">Controle</button>
+  <button data-t="energy">Energia</button>
+</nav>
+
+<script>
+(function () {
+  var MODE_LABELS = { COOL: "Frio", HEAT: "Quente", FAN: "Ventilar", AIR_DRY: "Desumidificar",
+    AUTO: "Automático", AIR_CLEAN: "Purificar", ENERGY_SAVING: "Economia", AROMA: "Aroma" };
+  var WIND_ORDER = ["SLOW", "LOW", "LOW_MID", "MID", "MID_HIGH", "HIGH", "POWER"];
+  var DEFAULT_MODES = ["COOL", "FAN", "AIR_DRY", "AUTO"];
+  var DEFAULT_WINDS = ["LOW", "MID", "HIGH", "AUTO"];
+  var MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+  var WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var store = {
+    get: function (k) { try { return JSON.parse(localStorage.getItem("meuar." + k)); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem("meuar." + k, JSON.stringify(v)); } catch (e) {} },
+    del: function (k) { try { localStorage.removeItem("meuar." + k); } catch (e) {} }
+  };
+
+  var password = store.get("pw");
+  var devices = store.get("devices") || [];
+  var currentId = store.get("current");
+  var tab = store.get("tab") || "control";
+  var price = store.get("price") || 1.15;
+  var state = null;
+  var profile = null;
+  var busy = 0;
+  var tempTimer = null;
+  var pendingTarget = null;
+
+  function api(method, path, body) {
+    var ctrl = new AbortController();
+    var t = setTimeout(function () { ctrl.abort(); }, 15000);
+    busy++; spin();
+    var parts = path.split("?");
+    return fetch("/api/lg?route=" + encodeURIComponent(parts[0]) + (parts[1] ? "&" + parts[1] : ""), {
+      method: method,
+      headers: { "x-app-password": password || "", "content-type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined,
+      signal: ctrl.signal
+    }).then(function (r) {
+      return r.json().catch(function () { return { ok: false, error: "Resposta estranha do servidor." }; })
+        .then(function (j) {
+          if (r.status === 401) {
+            password = null; store.del("pw");
+            showLogin("Senha errada. Tente de novo.");
+            throw new Error("401");
+          }
+          if (!j.ok) throw new Error(j.error || "Algo deu errado.");
+          return j.data;
+        });
+    }, function (e) {
+      throw new Error(e && e.name === "AbortError" ? "Demorou demais. Tente de novo." : "Sem internet?");
+    }).finally(function () { clearTimeout(t); busy--; spin(); });
+  }
+
+  function spin() { $("refresh").classList.toggle("spin", busy > 0); }
+
+  function msg(text) {
+    var el = $("msg");
+    el.textContent = text || "";
+    el.className = "msg" + (text ? " show" : "");
+  }
+  function showErr(e) { if (e && e.message !== "401") msg(e.message); }
+
+  function showLogin(text) {
+    $("main").classList.add("hidden");
+    $("tabs").classList.add("hidden");
+    $("login").classList.remove("hidden");
+    msg(text || "");
+    setTimeout(function () { $("pw").focus(); }, 50);
+  }
+
+  function brl(v) { return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
+  function kwh(v) { return v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWh"; }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function ymd(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()); }
+  function ym(d) { return d.getFullYear() + pad(d.getMonth() + 1); }
+  function daysIn(y, m) { return new Date(y, m + 1, 0).getDate(); }
+  function today0() { var d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+
+  function tempBlock(s) {
+    if (!s) return null;
+    var t = s.temperatureInUnits;
+    if (Array.isArray(t)) {
+      for (var i = 0; i < t.length; i++) if (t[i] && t[i].unit === "C") return t[i];
+      return t[0] || null;
+    }
+    if (t && typeof t === "object") return t;
+    return s.temperature || null;
+  }
+  function isOn(s) { return !!(s && s.operation && s.operation.airConOperationMode === "POWER_ON"); }
+  function jobMode(s) { return s && s.airConJobMode ? s.airConJobMode.currentJobMode : null; }
+  function windKey() {
+    var af = profile && profile.property && profile.property.airFlow;
+    if (af && af.windStrengthDetail) return "windStrengthDetail";
+    if (state && state.airFlow && state.airFlow.windStrengthDetail && !state.airFlow.windStrength) return "windStrengthDetail";
+    return "windStrength";
+  }
+  function wind(s) { return s && s.airFlow ? s.airFlow[windKey()] : null; }
+  function hasSwing() {
+    var p = profile && profile.property && profile.property.windDirection;
+    return !!((p && p.rotateUpDown) || (state && state.windDirection && "rotateUpDown" in state.windDirection));
+  }
+  function swingOn(s) { return !!(s && s.windDirection && s.windDirection.rotateUpDown); }
+
+  function options(resource, prop, fallback) {
+    try {
+      var p = profile.property[resource][prop];
+      var w = p.value && (p.value.w || p.value.r);
+      if (Array.isArray(w) && w.length) return w;
+    } catch (e) {}
+    return fallback;
+  }
+  function windLevels() {
+    var list = options("airFlow", windKey(), DEFAULT_WINDS).slice();
+    var auto = list.indexOf("AUTO") >= 0;
+    list = list.filter(function (v) { return v !== "AUTO"; });
+    list.sort(function (a, b) {
+      var ia = WIND_ORDER.indexOf(a), ib = WIND_ORDER.indexOf(b);
+      return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+    });
+    if (auto) list.push("AUTO");
+    return list;
+  }
+  function windLabel(v) {
+    if (v === "AUTO") return "Auto";
+    var i = windLevels().indexOf(v);
+    return i >= 0 ? "Nível " + (i + 1) : (v || "--");
+  }
+  function tempRange() {
+    var r = { min: 16, max: 30, step: 1 };
+    try {
+      var res = profile.property.temperatureInUnits || profile.property.temperature;
+      if (Array.isArray(res)) res = res.filter(function (x) { return x.unit === "C"; })[0] || res[0];
+      var tt = res.targetTemperatureC || res.targetTemperature;
+      var v = tt && tt.value && (tt.value.w || tt.value);
+      if (v && typeof v.min === "number") r = { min: v.min, max: v.max, step: v.step || 1 };
+    } catch (e) {}
+    return r;
+  }
+
+  function render() {
+    renderDevices();
+    if (!state) return;
+    var on = isOn(state);
+    var tb = tempBlock(state) || {};
+    $("room").textContent = typeof tb.currentTemperature === "number"
+      ? tb.currentTemperature.toLocaleString("pt-BR") + "°C" : "--";
+    $("status").textContent = on ? "Ligado" : "Desligado";
+    $("power").className = "power" + (on ? " on" : "");
+
+    var r = tempRange();
+    var tgt = pendingTarget != null ? pendingTarget : tb.targetTemperature;
+    $("target").textContent = (typeof tgt === "number" ? tgt.toLocaleString("pt-BR") : "--") + "°C";
+    var sl = $("tslider");
+    sl.min = r.min; sl.max = r.max; sl.step = r.step;
+    if (typeof tgt === "number" && document.activeElement !== sl) sl.value = tgt;
+    var mode = jobMode(state);
+    $("tempcard").classList.toggle("disabled", !(on && (mode === "COOL" || mode === "HEAT" || mode === "AUTO")));
+
+    var sel = $("mode");
+    var modes = options("airConJobMode", "currentJobMode", DEFAULT_MODES);
+    sel.innerHTML = "";
+    modes.forEach(function (m) {
+      var o = document.createElement("option");
+      o.value = m; o.textContent = MODE_LABELS[m] || m;
+      sel.appendChild(o);
+    });
+    sel.value = mode || "";
+    $("modename").textContent = MODE_LABELS[mode] || mode || "--";
+    $("modewrap").classList.toggle("disabled", !on);
+
+    $("windval").textContent = windLabel(wind(state));
+    $("windtile").classList.toggle("disabled", !on);
+    $("swingtile").classList.toggle("hidden", !hasSwing());
+    $("swingtile").classList.toggle("disabled", !on);
+    $("swing").className = "switch" + (swingOn(state) ? " on" : "");
+  }
+
+  function renderDevices() {
+    var box = $("devices");
+    box.innerHTML = "";
+    box.classList.toggle("hidden", devices.length < 2);
+    devices.forEach(function (d) {
+      var b = document.createElement("button");
+      b.className = "chip" + (d.id === currentId ? " sel" : "");
+      b.textContent = d.name;
+      b.onclick = function () { selectDevice(d.id); };
+      box.appendChild(b);
+    });
+    var cur = devices.filter(function (d) { return d.id === currentId; })[0];
+    $("title").textContent = cur ? cur.name : "Meu Ar";
+  }
+
+  function stamp(ts) {
+    if (!ts) { $("updated").innerHTML = "&nbsp;"; return; }
+    $("updated").textContent = "Atualizado às " +
+      new Date(ts).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function loadDevices() {
+    return api("GET", "devices").then(function (list) {
+      devices = (list || []).filter(function (d) {
+        return d.deviceInfo && /AIR_CONDITIONER/.test(d.deviceInfo.deviceType || "");
+      }).map(function (d) {
+        return { id: d.deviceId, name: d.deviceInfo.alias || d.deviceInfo.modelName || "Ar-condicionado" };
+      });
+      store.set("devices", devices);
+      if (!devices.length) throw new Error("Não achei nenhum ar-condicionado na sua conta LG.");
+      if (!devices.some(function (d) { return d.id === currentId; })) {
+        currentId = devices[0].id;
+        store.set("current", currentId);
+      }
+    });
+  }
+
+  function loadProfile() {
+    profile = store.get("profile." + currentId);
+    if (profile) return Promise.resolve();
+    return api("GET", "devices/" + currentId + "/profile").then(function (p) {
+      profile = p || {};
+      store.set("profile." + currentId, profile);
+    }).catch(function () { profile = {}; });
+  }
+
+  function loadState() {
+    return api("GET", "devices/" + currentId + "/state").then(function (s) {
+      state = s || {};
+      store.set("state." + currentId, { s: state, at: Date.now() });
+      stamp(Date.now());
+      render();
+    });
+  }
+
+  function showCached() {
+    var c = currentId && store.get("state." + currentId);
+    profile = currentId ? store.get("profile." + currentId) : null;
+    if (c) { state = c.s; stamp(c.at); render(); }
+    else { state = null; renderDevices(); }
+  }
+
+  function refresh() {
+    msg("");
+    var p = devices.length && currentId ? Promise.resolve() : loadDevices();
+    return p.then(loadProfile).then(function () {
+      return tab === "energy" ? loadEnergy(true) : loadState();
+    }).catch(showErr);
+  }
+
+  function selectDevice(id) {
+    currentId = id;
+    store.set("current", id);
+    pendingTarget = null;
+    showCached();
+    if (tab === "energy") showEnergyCached();
+    refresh();
+  }
+
+  function control(body, optimistic) {
+    var before = JSON.parse(JSON.stringify(state || {}));
+    if (optimistic) { optimistic(state); render(); }
+    msg("");
+    return api("POST", "devices/" + currentId + "/control", body)
+      .then(function () { setTimeout(function () { loadState().catch(function () {}); }, 2500); })
+      .catch(function (e) { state = before; render(); showErr(e); });
+  }
+
+  function setPower() {
+    if (!state) return;
+    var next = isOn(state) ? "POWER_OFF" : "POWER_ON";
+    control({ operation: { airConOperationMode: next } }, function (s) {
+      s.operation = s.operation || {};
+      s.operation.airConOperationMode = next;
+    });
+  }
+
+  function setMode(m) {
+    control({ airConJobMode: { currentJobMode: m } }, function (s) {
+      s.airConJobMode = s.airConJobMode || {};
+      s.airConJobMode.currentJobMode = m;
+    });
+  }
+
+  function stepWind(dir) {
+    var levels = windLevels();
+    var i = levels.indexOf(wind(state));
+    var next = levels[Math.min(levels.length - 1, Math.max(0, (i < 0 ? 0 : i) + dir))];
+    if (!next || next === wind(state)) return;
+    var key = windKey();
+    var body = { airFlow: {} };
+    body.airFlow[key] = next;
+    control(body, function (s) { s.airFlow = s.airFlow || {}; s.airFlow[key] = next; });
+  }
+
+  function toggleSwing() {
+    var next = !swingOn(state);
+    control({ windDirection: { rotateUpDown: next } }, function (s) {
+      s.windDirection = s.windDirection || {};
+      s.windDirection.rotateUpDown = next;
+    });
+  }
+
+  function setTemp(t) {
+    var r = tempRange();
+    pendingTarget = Math.min(r.max, Math.max(r.min, t));
+    render();
+    clearTimeout(tempTimer);
+    tempTimer = setTimeout(function () {
+      var v = pendingTarget;
+      var body = state && state.temperatureInUnits !== undefined
+        ? { temperatureInUnits: { targetTemperature: v, unit: "C" } }
+        : { temperature: { targetTemperature: v, unit: "C" } };
+      control(body, function (s) {
+        var b = tempBlock(s);
+        if (b) b.targetTemperature = v;
+      }).then(function () { pendingTarget = null; render(); });
+    }, 700);
+  }
+  function bumpTemp(dir) {
+    var tb = tempBlock(state) || {};
+    var cur = pendingTarget != null ? pendingTarget : (typeof tb.targetTemperature === "number" ? tb.targetTemperature : 24);
+    setTemp(cur + dir * tempRange().step);
+  }
+
+  var ePeriod = store.get("eperiod") || "month";
+  var eOffset = 0;
+  var eSelected = null;
+  var eView = null;
+
+  function energyProp() {
+    var c = store.get("eprop." + currentId);
+    if (c) return Promise.resolve(c);
+    return api("GET", "devices/" + currentId + "/energy-profile").then(function (p) {
+      var list = (p && p.result && p.result.property) || [];
+      var prop = typeof list[0] === "string" ? list[0] : (list[0] && (list[0].property || list[0].name));
+      if (!prop) throw new Error("Seu ar não manda dados de energia pela LG.");
+      store.set("eprop." + currentId, prop);
+      return prop;
+    });
+  }
+
+  function usage(period, start, end, force) {
+    var ck = "energy." + currentId + "." + period + "." + start + "." + end;
+    var cached = store.get(ck);
+    var isPast = end < (period === "MONTHLY" ? ym(new Date()) : ymd(new Date()));
+    if (cached && !force && (isPast || Date.now() - cached.at < 10 * 60 * 1000)) return Promise.resolve(cached.list);
+    return energyProp().then(function (prop) {
+      var q = "property=" + encodeURIComponent(prop) + "&period=" + period + "&startDate=" + start + "&endDate=" + end;
+      return api("GET", "devices/" + currentId + "/energy-usage?" + q).then(function (d) {
+        var raw = (d && d.result && d.result.dataList) || [];
+        var list = raw.map(function (item, i) {
+          var key = null;
+          for (var k in item) {
+            if (typeof item[k] === "string" && /^\d{6,8}$/.test(item[k])) { key = item[k]; break; }
+          }
+          var wh = Number(item[prop] != null ? item[prop] : item.energyUsage) || 0;
+          return { key: key, idx: i, kwh: wh / 1000 };
+        });
+        store.set(ck, { at: Date.now(), list: list });
+        return list;
+      });
+    });
+  }
+
+  function fill(slots, list) {
+    var byKey = {};
+    var keyed = list.some(function (x) { return x.key; });
+    list.forEach(function (x) { if (x.key) byKey[x.key] = x.kwh; });
+    return slots.map(function (s, i) {
+      var v = keyed ? byKey[s.key] : (list[i] ? list[i].kwh : undefined);
+      return { key: s.key, label: s.label, long: s.long, kwh: v || 0, future: s.future };
+    });
+  }
+
+  function viewRange() {
+    var now = today0();
+    var slots = [], title, period, start, end;
+    if (ePeriod === "week") {
+      var sun = new Date(now); sun.setDate(now.getDate() - now.getDay() + eOffset * 7);
+      for (var i = 0; i < 7; i++) {
+        var d = new Date(sun); d.setDate(sun.getDate() + i);
+        slots.push({ key: ymd(d), label: WEEKDAYS[i], long: WEEKDAYS[i].toLowerCase() + ", " + d.getDate() + " de " + MONTHS[d.getMonth()], future: d > now });
+      }
+      var sat = new Date(sun); sat.setDate(sun.getDate() + 6);
+      title = pad(sun.getDate()) + "/" + pad(sun.getMonth() + 1) + " – " + pad(sat.getDate()) + "/" + pad(sat.getMonth() + 1);
+      period = "DAILY"; start = slots[0].key; end = ymd(sat < now ? sat : now);
+    } else if (ePeriod === "month") {
+      var m = new Date(now.getFullYear(), now.getMonth() + eOffset, 1);
+      var n = daysIn(m.getFullYear(), m.getMonth());
+      for (var j = 1; j <= n; j++) {
+        var dd = new Date(m.getFullYear(), m.getMonth(), j);
+        slots.push({ key: ymd(dd), label: (j === 1 || j % 5 === 0) ? String(j) : "", long: j + " de " + MONTHS[m.getMonth()], future: dd > now });
+      }
+      title = MONTHS[m.getMonth()] + " de " + m.getFullYear();
+      var last = new Date(m.getFullYear(), m.getMonth(), n);
+      period = "DAILY"; start = slots[0].key; end = ymd(last < now ? last : now);
+    } else {
+      var y = now.getFullYear() + eOffset;
+      for (var k = 0; k < 12; k++) {
+        var md = new Date(y, k, 1);
+        slots.push({ key: ym(md), label: MONTHS[k].charAt(0).toUpperCase(), long: MONTHS[k] + " de " + y, future: md > now });
+      }
+      title = String(y);
+      period = "MONTHLY"; start = y + "01"; end = y === now.getFullYear() ? ym(now) : y + "12";
+    }
+    return { slots: slots, title: title, period: period, start: start, end: end };
+  }
+
+  function loadEnergy(force) {
+    var p1 = loadView(force);
+    var now = today0();
+    var mStart = ymd(new Date(now.getFullYear(), now.getMonth(), 1));
+    var p2 = usage("DAILY", mStart, ymd(now), force).then(function (list) {
+      var days = [];
+      for (var d = 1; d <= now.getDate(); d++) days.push({ key: ymd(new Date(now.getFullYear(), now.getMonth(), d)) });
+      renderTop(fill(days, list), now);
+    });
+    return Promise.all([p1, p2]).then(function () { stamp(Date.now()); }).catch(showErr);
+  }
+
+  function loadView(force) {
+    var r = viewRange();
+    $("elabel").textContent = r.title;
+    $("enext").disabled = eOffset >= 0;
+    return usage(r.period, r.start, r.end, force).then(function (list) {
+      eView = { range: r, data: fill(r.slots, list) };
+      if (eSelected == null || eSelected >= eView.data.length) {
+        eSelected = lastWithData(eView.data);
+      }
+      renderChart();
+    });
+  }
+
+  function lastWithData(data) {
+    for (var i = data.length - 1; i >= 0; i--) if (!data[i].future) return i;
+    return 0;
+  }
+
+  function renderTop(days, now) {
+    var todayK = days.length ? days[days.length - 1].kwh : 0;
+    var monthK = days.reduce(function (a, d) { return a + d.kwh; }, 0);
+    var full = days.slice(0, -1);
+    var avg = full.length ? full.reduce(function (a, d) { return a + d.kwh; }, 0) / full.length : todayK;
+    var left = daysIn(now.getFullYear(), now.getMonth()) - full.length;
+    var projK = (monthK - todayK) + avg * left;
+    $("e-today-r").textContent = brl(todayK * price);
+    $("e-today-k").textContent = kwh(todayK);
+    $("e-month-r").textContent = brl(monthK * price);
+    $("e-month-k").textContent = kwh(monthK);
+    $("e-proj-r").textContent = brl(projK * price);
+    $("e-proj-k").textContent = "≈ " + kwh(projK) + " · média de " + kwh(avg) + " por dia";
+    store.set("etop." + currentId, { days: days, at: Date.now() });
+  }
+
+  function niceMax(v) {
+    if (v <= 0) return 1;
+    var p = Math.pow(10, Math.floor(Math.log10(v)));
+    var steps = [1, 2, 2.5, 5, 10];
+    for (var i = 0; i < steps.length; i++) if (steps[i] * p >= v) return steps[i] * p;
+    return 10 * p;
+  }
+
+  function renderChart() {
+    if (!eView) return;
+    var data = eView.data;
+    var past = data.filter(function (d) { return !d.future; });
+    var total = past.reduce(function (a, d) { return a + d.kwh; }, 0);
+    $("etotal").textContent = kwh(total);
+    $("ecost").textContent = brl(total * price);
+    $("eavgk").textContent = ePeriod === "year" ? "Média por mês" : "Média por dia";
+    $("eavg").textContent = past.length ? brl(total / past.length * price) + " (" + kwh(total / past.length) + ")" : "--";
+
+    var max = niceMax(Math.max.apply(null, data.map(function (d) { return d.kwh; })));
+    var chart = $("chart");
+    chart.innerHTML = "";
+    [0, 0.5, 1].forEach(function (f) {
+      var g = document.createElement("div");
+      g.className = "gridline";
+      g.style.bottom = (f * 100) + "%";
+      var lab = document.createElement("span");
+      lab.textContent = (max * f).toLocaleString("pt-BR", { maximumFractionDigits: 1 });
+      g.appendChild(lab);
+      chart.appendChild(g);
+    });
+    var bars = document.createElement("div");
+    bars.className = "bars";
+    data.forEach(function (d, i) {
+      var hit = document.createElement("div");
+      hit.className = "barhit" + (i === eSelected ? " sel" : "");
+      hit.setAttribute("role", "button");
+      hit.setAttribute("aria-label", d.long + ": " + kwh(d.kwh));
+      var b = document.createElement("div");
+      b.className = "bar";
+      b.style.height = (d.kwh / max * 100) + "%";
+      hit.appendChild(b);
+      hit.onclick = function () { eSelected = i; renderChart(); };
+      hit.onmouseenter = hit.onclick;
+      bars.appendChild(hit);
+    });
+    chart.appendChild(bars);
+
+    var xl = $("xlabels");
+    xl.innerHTML = "";
+    data.forEach(function (d) { var s = document.createElement("span"); s.textContent = d.label; xl.appendChild(s); });
+
+    var sel = data[eSelected];
+    var det = $("edetail");
+    det.innerHTML = "";
+    var a = document.createElement("span");
+    var b2 = document.createElement("b");
+    a.textContent = sel ? sel.long : "--";
+    b2.textContent = !sel ? "--" : sel.future ? "--" : kwh(sel.kwh) + " · " + brl(sel.kwh * price);
+    det.appendChild(a); det.appendChild(b2);
+
+    var tbl = $("etable");
+    tbl.innerHTML = "";
+    past.slice().reverse().forEach(function (d) {
+      var tr = document.createElement("tr");
+      [d.long, kwh(d.kwh), brl(d.kwh * price)].forEach(function (t) {
+        var td = document.createElement("td"); td.textContent = t; tr.appendChild(td);
+      });
+      tbl.appendChild(tr);
+    });
+  }
+
+  function showEnergyCached() {
+    var top = store.get("etop." + currentId);
+    if (top) renderTop(top.days, today0());
+  }
+
+  function setTab(t) {
+    tab = t;
+    store.set("tab", t);
+    $("tab-control").classList.toggle("hidden", t !== "control");
+    $("tab-energy").classList.toggle("hidden", t !== "energy");
+    [].forEach.call($("tabs").children, function (b) { b.classList.toggle("sel", b.getAttribute("data-t") === t); });
+    msg("");
+    if (t === "energy") { showEnergyCached(); loadEnergy(false); }
+    else if (password) { showCached(); loadState().catch(showErr); }
+  }
+
+  $("power").onclick = setPower;
+  $("mode").onchange = function () { setMode(this.value); };
+  $("tminus").onclick = function () { bumpTemp(-1); };
+  $("tplus").onclick = function () { bumpTemp(1); };
+  $("tslider").oninput = function () { setTemp(Number(this.value)); };
+  $("wminus").onclick = function () { stepWind(-1); };
+  $("wplus").onclick = function () { stepWind(1); };
+  $("swing").onclick = toggleSwing;
+  $("refresh").onclick = function () { if (!busy) refresh(); };
+  [].forEach.call($("tabs").children, function (b) { b.onclick = function () { setTab(b.getAttribute("data-t")); }; });
+  [].forEach.call($("eperiod").children, function (b) {
+    b.classList.toggle("sel", b.getAttribute("data-p") === ePeriod);
+    b.onclick = function () {
+      ePeriod = b.getAttribute("data-p"); store.set("eperiod", ePeriod);
+      eOffset = 0; eSelected = null;
+      [].forEach.call($("eperiod").children, function (x) { x.classList.toggle("sel", x === b); });
+      loadView(false).catch(showErr);
+    };
+  });
+  $("eprev").onclick = function () { eOffset--; eSelected = null; loadView(false).catch(showErr); };
+  $("enext").onclick = function () { if (eOffset < 0) { eOffset++; eSelected = null; loadView(false).catch(showErr); } };
+  $("kwhprice").value = price.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+  $("kwhprice").onchange = function () {
+    var v = parseFloat(this.value.replace(/\./g, "").replace(",", "."));
+    if (!(v > 0)) { this.value = price.toLocaleString("pt-BR", { minimumFractionDigits: 2 }); return; }
+    price = v; store.set("price", v);
+    this.value = v.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+    showEnergyCached(); renderChart();
+  };
+  $("logout").onclick = function () { password = null; store.del("pw"); showLogin(""); };
+  $("pwgo").onclick = function () {
+    var v = $("pw").value;
+    if (!v) return;
+    password = v;
+    store.set("pw", v);
+    start();
+  };
+  $("pw").onkeydown = function (e) { if (e.key === "Enter") $("pwgo").click(); };
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible" && password && !busy) refresh();
+  });
+
+  function start() {
+    $("login").classList.add("hidden");
+    $("main").classList.remove("hidden");
+    $("tabs").classList.remove("hidden");
+    showCached();
+    var p = devices.length && currentId ? Promise.resolve() : loadDevices();
+    p.then(loadProfile).then(function () { setTab(tab); }).catch(showErr);
+  }
+  if (!password) { showLogin(""); return; }
+  start();
+})();
+</script>
+</body>
+</html>
