@@ -94,7 +94,7 @@ export function AuthScreen({
     <Page>
       <div className="mx-auto flex min-h-full max-w-md flex-col justify-center py-10">
         <div className="mb-8 flex flex-col items-center gap-3 px-6 text-center">
-          <img src="/logo.png" alt="AirSnap" className="h-24 w-24 drop-shadow-[0_8px_24px_rgba(56,189,248,0.35)]" />
+          <img src="/logo.png" alt="AirSnap" className="h-28 w-28 drop-shadow-[0_8px_24px_rgba(56,189,248,0.35)]" />
           <h1 className="text-4xl font-bold">{HEADINGS[mode].title}</h1>
           <p className="opacity-70">{HEADINGS[mode].text}</p>
         </div>
