@@ -1,0 +1,211 @@
+@import "tailwindcss";
+@import "konsta/react/theme.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+html {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #000;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.airsnap-range {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 28px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.airsnap-range:focus {
+  outline: none;
+}
+
+.airsnap-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, var(--color-primary) var(--fill), rgb(255 255 255 / 0.2) var(--fill));
+}
+
+.airsnap-range::-moz-range-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, var(--color-primary) var(--fill), rgb(255 255 255 / 0.2) var(--fill));
+}
+
+.airsnap-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 38px;
+  height: 24px;
+  margin-top: -9px;
+  border: 0;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.4);
+  transition: transform 0.15s ease;
+}
+
+.airsnap-range::-moz-range-thumb {
+  width: 38px;
+  height: 24px;
+  border: 0;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.4);
+  transition: transform 0.15s ease;
+}
+
+.airsnap-range:active::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+
+.airsnap-range:active::-moz-range-thumb {
+  transform: scale(1.12);
+}
+
+.airsnap-range:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@keyframes ac-led {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes air-flake {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.95;
+  }
+  35% {
+    transform: translate(calc(var(--dx, 0px) * 0.3 + 4px), 30px) rotate(70deg);
+  }
+  65% {
+    transform: translate(calc(var(--dx, 0px) * 0.7 - 4px), 58px) rotate(130deg);
+  }
+  100% {
+    transform: translate(var(--dx, 0px), 88px) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+@keyframes air-breathe {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.air-flake {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: air-flake var(--fall, 4s) linear infinite;
+}
+
+.air-breathe {
+  animation: air-breathe 3s ease-in-out infinite;
+}
+
+.ac-flap {
+  transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.ac-led {
+  animation: ac-led 2.4s ease-in-out infinite;
+}
+
+@keyframes hud-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes hud-pop {
+  0% {
+    transform: scale(0.4);
+  }
+  60% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes hud-draw {
+  from {
+    stroke-dashoffset: 30;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes hud-shake {
+  0%,
+  100% {
+    translate: 0;
+  }
+  20%,
+  60% {
+    translate: -5px;
+  }
+  40%,
+  80% {
+    translate: 5px;
+  }
+}
+
+.hud-in {
+  animation: hud-in 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.hud-pop {
+  animation: hud-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+
+.hud-draw {
+  stroke-dasharray: 30;
+  animation: hud-draw 0.4s ease-out 0.05s both;
+}
+
+.hud-shake {
+  animation:
+    hud-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3) both,
+    hud-shake 0.4s ease-in-out 0.35s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-in,
+  .hud-pop,
+  .hud-draw,
+  .air-flake,
+  .air-breathe,
+  .ac-led,
+  .hud-shake {
+    animation: none;
+  }
+}
