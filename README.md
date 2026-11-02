@@ -134,6 +134,10 @@ Abre em `http://localhost:3000`, com o servidor da LG junto.
 
 Desenvolvido com agentes do **Claude Code**, seguindo as regras do [AGENTS.md](AGENTS.md): sem comentários no código, Konsta UI primeiro, toda tela centralizada e acessibilidade em todas as telas.
 
+## Licença
+
+[GPL-3.0](LICENSE). Pode usar, estudar e mudar. Se distribuir uma versão modificada, ela também precisa ter o código aberto, sob a mesma licença.
+
 ---
 
 - [AGENTS.md](AGENTS.md): regras do projeto e notas da API da LG
