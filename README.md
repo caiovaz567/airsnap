@@ -136,10 +136,12 @@ Desenvolvido com agentes do **Claude Code**, seguindo as regras do [AGENTS.md](A
 
 ## Licença
 
-[GPL-3.0](LICENSE). Pode usar, estudar e mudar. Se distribuir uma versão modificada, ela também precisa ter o código aberto, sob a mesma licença.
+O AirSnap é software livre, sob a [GNU General Public License v3.0](LICENSE).
 
 ---
 
 - [AGENTS.md](AGENTS.md): regras do projeto e notas da API da LG
 - [supabase/schema.sql](supabase/schema.sql): banco e permissões
 - [API ThinQ Connect](https://connect-pat.lgthinq.com): onde gerar o token pessoal
+
+<sub>O AirSnap é um projeto independente e não é afiliado nem endossado pela LG Electronics.</sub>
